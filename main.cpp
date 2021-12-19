@@ -1,13 +1,31 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <ctime>
+#include <vector>
 
-class User
+using namespace std;
+
+class AbstractUser
 {
+private:
+	string login;
+	string password;
+	int id;
+protected:
+	virtual int getID() = 0;
+
+};
+
+class User: public AbstractUser
+{
+private:
 	string login;
 	string password;
 	int id;
 public:
-	int getID()
+	
+	int getID() override
 	{
 		return id;
 	}
@@ -15,7 +33,25 @@ public:
 	{
 		return (other.id == this->id);
 	}
+	User()
+	{
+		srand(time(NULL));
+		cout << "Введите логин и пароль: " << endl;
+		cin >> login >> password;
+		id = rand() % 1000000;
+	}
+	void setID(int new_id)
+	{
+		this->id = new_id;
+	}
+	void setID()
+	{
+		this->id = rand() % 1000000;
+	}
 };
+
+
+
 
 struct Time
 {
@@ -79,7 +115,7 @@ class Dish
 {
 	int price = 0;
 	int ingridientCount = 0;
-	string type = "<undefined>";
+	string type = "";
 	string* ingridients = new string[ingridientCount];
 public:
 	bool is_vegeterian()
@@ -106,26 +142,56 @@ public:
 	{
 		return price;
 	}
+	void set_all(int price, int ingridient_count, string type)
+	{
+		this->price = price;
+		this->ingridientCount = ingridientCount;
+		this->type = type;
+	}
 };
 
 class Menu
 {
-	int length;
-	
-	Dish *menu = new Dish[length];
+	vector<Dish> menu;
 public:
 	double getAveragePrice()
 	{
-		int summ;
-		for (size_t i = 0; i < length; i++)
+		int summ = 0;
+		for (size_t i = 0; i < menu.size(); i++)
 		{
 			summ += menu[i].getPrice();
 		}
 	}
+
+	
+	void add_new_dish(Dish dsh)
+	{
+		menu.push_back(dsh);
+	}
+	void add_new_dish()
+	{
+		Dish dsh;
+		int price, ingridient_count;
+		string type;
+		try
+		{
+			cin >> price >> ingridient_count >> type;
+		}
+		catch (const std::exception&)
+		{
+			cout << "Input error!" << endl;
+			return;
+		}
+		dsh.set_all(price, ingridient_count, type);
+		
+	}
 };
+
+
 
 class FoodPoint
 {
+	friend class Host;
 	double ratesumm;
 	WorkTime worktime;
 	string name;
@@ -137,7 +203,8 @@ class FoodPoint
 		return (double)ratesumm / ratecount;
 	}
 public:
-	void setRate(int mark, User u)
+	template <class Number>
+	void setRate(Number mark, User u)
 	{
 		if (mark < 1 || mark > 5)
 		{
@@ -153,6 +220,7 @@ public:
 		ratesumm += mark;
 		ratecount++;
 	}
+	
 	double getAverageChecksumm()
 	{
 		menu.getAveragePrice();
@@ -163,13 +231,32 @@ public:
 	}
 
 };
+class Host : public AbstractUser
+{
+private:
+	FoodPoint fp;
+	int id;
+public:
+
+	
+	int getID() override
+	{
+		return this->getID();
+	}
+	bool performance_assessment_fp()
+	{
+		return (fp.getRate() > 3.5);
+	}
+};
 
 
-using namespace std;
 
 int main()
 {
+	
 	setlocale(LC_ALL, "ru");
 	
+
+
 	return 0;
 }
