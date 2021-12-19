@@ -142,6 +142,10 @@ public:
 	{
 		return price;
 	}
+	string getType()
+	{
+		return type;
+	}
 	void set_all(int price, int ingridient_count, string type)
 	{
 		this->price = price;
@@ -166,6 +170,7 @@ public:
 	
 	void add_new_dish(Dish dsh)
 	{
+		menu.resize(menu.size() + 1);
 		menu.push_back(dsh);
 	}
 	void add_new_dish()
@@ -173,6 +178,7 @@ public:
 		Dish dsh;
 		int price, ingridient_count;
 		string type;
+		cout << "Введите цену, количество ингридиентов, и тип нового блюда... ";
 		try
 		{
 			cin >> price >> ingridient_count >> type;
@@ -184,6 +190,14 @@ public:
 		}
 		dsh.set_all(price, ingridient_count, type);
 		
+		menu.push_back(dsh);
+	}
+	void print_menu()
+	{
+		for (size_t i = 0; i < menu.size(); i++)
+		{
+			cout << menu[i].getType() << '\t' << menu[i].getPrice() << endl;
+		}
 	}
 };
 
@@ -206,19 +220,28 @@ public:
 	template <class Number>
 	void setRate(Number mark, User u)
 	{
-		if (mark < 1 || mark > 5)
-		{
-			return;
-		}
-		for (int i = 0; i < ratecount; i++)
-		{
-			if (u == ratelist[i])
+		
+			if (mark < 1 || mark > 5)
 			{
 				return;
 			}
-		}
-		ratesumm += mark;
-		ratecount++;
+			for (int i = 0; i < ratecount; i++)
+			{
+				if (u == ratelist[i])
+				{
+					return;
+				}
+			}
+			ratesumm += mark;
+			ratecount++;	
+	}
+	Menu get_menu()
+	{
+		return this->menu;
+	}
+	void print_menu()
+	{
+		this->menu.print_menu();
 	}
 	
 	double getAverageChecksumm()
@@ -241,11 +264,24 @@ public:
 	
 	int getID() override
 	{
-		return this->getID();
+		return this->id;
 	}
 	bool performance_assessment_fp()
 	{
 		return (fp.getRate() > 3.5);
+	}
+	void set_fp(FoodPoint newfp)
+	{
+		this->fp = newfp;
+	}
+	void set_fp()
+	{
+		this->fp = FoodPoint();
+	}
+	Host()
+	{
+		this->id = rand() % 1000000;
+		set_fp();
 	}
 };
 
@@ -255,8 +291,27 @@ int main()
 {
 	
 	setlocale(LC_ALL, "ru");
-	
+	User localuser;
+	Host localhost;
+	FoodPoint pryanik;
 
+	pryanik.setRate(4.0, localuser);
+	pryanik.setRate(2.0, localuser);
+
+	localhost.set_fp(pryanik);
+	if (!localhost.performance_assessment_fp()) {
+		cout << "Низкое качество обслуживания" << endl;
+	}
+	else
+	{
+		cout << "Хорошее качество обслуживания" << endl;
+	}
+	cout << "ID localuser: " << localuser.getID() << "\tID localhost: " << localhost.getID() << endl;
+	Dish dsh;
+	dsh.set_all(150, 4, "fish");
+	pryanik.get_menu().add_new_dish(dsh);
+	pryanik.print_menu();
+	
 
 	return 0;
 }
